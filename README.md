@@ -14,6 +14,7 @@ This is a SIMPLE command-line frontend to lots of astrophotography tools. It's f
 
 ## Setup
 
+```
 moast add telescope "My-Scope" --aperture 200mm --focal-length 2000mm
 moast add mount "My-Mount" --type Alt-Az --autoguided=True --slew-rate "4deg/sec"
 moast add filter "Near-IR-Pass" --wavelengths "300nm-400nm" --description "Near infrared"
@@ -33,12 +34,13 @@ moast add filter-wheel-slot-content "MyFilterWheel:Slot4:Green"
 moast add filter-wheel-slot-content "MyFilterWheel:Slot5:Ultraviolet"
 
 moast add config "MyScope-AstroCam1-LRGBUV" --scope "My-Scope" --mount "MyMount" --sensor "Mirrorless1" --filter-wheel "MyFilterWheel"
+```
 
 ## Imaging
 
 ```
-$ moast compute-config --target "M 31" --human-readable
-Recommended configuration:
+$ moast add plan "plan-1" --target "M 31" --summarise
+Plan is as follows:
   Config: "MyScope-AstroCam1-LRGBUV"
   Scope: "MyScope"
   Mount: "MyMount"
@@ -62,7 +64,7 @@ Recommended configuration:
   Total Imaging time: 12 minutes 0 seconds (720 seconds)
   Total time (post initial slew): 13 minutes 1 seconds (781 seconds)
 
-$ moast capture --target "M 31"
+$ moast run-plan "plan-1"
 Connecting to equipment... complete.
 
 Beginning slew... complete
@@ -125,5 +127,12 @@ Processing images:
 Stitching panels... complete.
 
 4 Panel, 6 channel capture of M 31 successful.
+
+$ moast data list
+-------------------------------------------------------------------------------------------------------------------------------------------------------
+| Plan   | Target                   | Capture Start    | Capture End         | Num Images | Num Panels | Exposures Per Panel | Num Exposures | Size   |
++--------+--------------------------+------------------+---------------------+------------+------------+---------------------+---------------+--------+
+| plan-1 | M 31 (Andromeda Galaxy)  | 2025/01/01 12:00 | 2025/01/01 12:15:25 |          1 |          4 |                   3 |            12 |  250GB |
+-------------------------------------------------------------------------------------------------------------------------------------------------------
 ```
 

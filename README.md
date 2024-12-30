@@ -86,7 +86,10 @@ Plan is as follows:
   Total Imaging time: 12 minutes 0 seconds (720 seconds)
   Total time (post initial slew): 13 minutes 1 seconds (781 seconds)
 
-$ moast run "run-1" --plan "plan-1"
+$ moast add run "run-1" --plan "plan-1" --now
+$ moast run-scheduled
+run-1 was scheduled for "now". Beginning.
+
 Connecting to equipment... complete.
 
 Beginning slew... complete
@@ -151,11 +154,13 @@ Stitching panels... complete.
 run-1 (4 Panel, 6 channel capture of M 31) successful.
 ```
 
+Run scheduling will be supported later with plan-1
+
 ## Data management
 
 When you run a plan, data is captured to ~/.local/moast by default, but this path is configurable, so that you can easily store your astrophotography data
-on a NAS, for example.  You can browse your data directly -- they're normal astro files (FITS + metadata files, zipped to keep the two together), but can
-also manage your data via via `moast data`:
+on a NAS, for example.  You can browse your data directly --- they're normal astro files (FITS + metadata files, zipped to keep the two together) --- but can
+also manage your data using `moast data`:
 
 ```
 $ moast data list
@@ -170,15 +175,15 @@ Proc=Yes means that the original data has been processed (de-noised, de-rotated,
 data has been removed, post-processing. You can control this behaviour at plan execution time with commands like:
 
 ```
-$ moast run-plan plan-1 --no-process
-$ moast run-plan plan1 --keep-orig
+$ moast run run-1 --no-process
+$ moast run run-1 --keep-orig
 ```
 
 or later, with:
 
 ```
-$ moast process plan-1
-$ moast data drop-orig plan-1
+$ moast process run-1
+$ moast data drop-orig run-1
 ```
 
 You can find your data files on disk with:
@@ -191,7 +196,7 @@ $ moast data path run-1
 and finally, you can completely purge the data for a job with
 
 ```
-$ moast data delete plan-1-run-1
+$ moast data delete run-1
 plan-1 deleted.
 ```
 

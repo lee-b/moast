@@ -5,6 +5,23 @@ NOTE: no code here yet; the following is documentation of intended functionality
 
 This is a SIMPLE command-line frontend to lots of astrophotography tools. It's for grabbing images of objects in space, CORRECTLY.  What you do after that (science, or artistic interpretation with false color, or whatever) is up to you, but there is no reason for a lot of manual monitoring or intervention in the data acquitision process: we just want to get the data accurately, to begin with.
 
+## Requirements
+
+- A camera, connected to a computer, compatible with INDI, and pointed at something in the sky
+
+## Recommended
+
+- A decent telescope
+- A goto mount
+- An IR-capable astrophotography camera on said telescope
+- (Especially for an Alt-Az mount) an autoguider and autoguider camera, either attached to the telescope mount directly ("internal") or via your computer
+- A USB-controlled filter wheel
+- INDI compatibility for all of the above
+
+## Ideal
+
+- All of the above, plus an INDI-compatible observatory
+
 ## Installation
 
 ```
@@ -13,6 +30,8 @@ This is a SIMPLE command-line frontend to lots of astrophotography tools. It's f
 ```
 
 ## Setup
+
+To configure your system, run commands similar to the ones below (but matching your system, of course). This will store the entered data in `~/.config/moast`:
 
 ```
 moast add telescope "My-Scope" --aperture 200mm --focal-length 2000mm
@@ -35,6 +54,9 @@ moast add filter-wheel-slot-content "MyFilterWheel:Slot5:Ultraviolet"
 
 moast add config "MyScope-AstroCam1-LRGBUV" --scope "My-Scope" --mount "MyMount" --sensor "Mirrorless1" --filter-wheel "MyFilterWheel"
 ```
+
+You can back up and sync your config between machines simply by rsyncing `~/.config/moast` -- just don't run moast at the same time (for now; this will be atomic, but later).
+
 
 ## Imaging
 
@@ -64,7 +86,7 @@ Plan is as follows:
   Total Imaging time: 12 minutes 0 seconds (720 seconds)
   Total time (post initial slew): 13 minutes 1 seconds (781 seconds)
 
-$ moast run-plan "plan-1"
+$ moast run "run-1" --plan "plan-1"
 Connecting to equipment... complete.
 
 Beginning slew... complete
@@ -126,16 +148,64 @@ Processing images:
 
 Stitching panels... complete.
 
-4 Panel, 6 channel capture of M 31 successful.
+run-1 (4 Panel, 6 channel capture of M 31) successful.
+```
 
+## Data management
+
+When you run a plan, data is captured to ~/.local/moast by default, but this path is configurable, so that you can easily store your astrophotography data
+on a NAS, for example.  You can browse your data directly -- they're normal astro files (FITS + metadata files, zipped to keep the two together), but can
+also manage your data via via `moast data`:
+
+```
 $ moast data list
--------------------------------------------------------------------------------------------------------------------------------------------------------
-| Plan   | Target                   | Capture Start    | Capture End         | Num Images | Num Panels | Exposures Per Panel | Num Exposures | Size   |
-+--------+--------------------------+------------------+---------------------+------------+------------+---------------------+---------------+--------+
-| plan-1 | M 31 (Andromeda Galaxy)  | 2025/01/01 12:00 | 2025/01/01 12:15:25 |          1 |          4 |                   3 |            12 |  250GB |
--------------------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------------------------
+| Run   | Plan   | Target                   | Capture Start    | Capture End         | Images | Panels | Exposures/Panel | Exposures | Size   | Proc? | Orig? |
++-------+--------+--------------------------+------------------+---------------------+--------+--------+-----------------+-----------+--------+-------+-------+
+| run-1 | plan-1 | M 31 (Andromeda Galaxy)  | 2025/01/01 12:00 | 2025/01/01 12:15:25 |      1 |      4 |               3 |        12 |  500GB |   Yes |    No |
+---------------------------------------------------------------------------------------------------------------------------------------------------------------
+```
 
+Proc=Yes means that the original data has been processed (de-noised, de-rotated, stitched, etc.). Orig=no means that original individual exposure per panel
+data has been removed, post-processing. You can control this behaviour at plan execution time with commands like:
+
+```
+$ moast run-plan plan-1 --no-process
+$ moast run-plan plan1 --keep-orig
+```
+
+or later, with:
+
+```
+$ moast process plan-1
+$ moast data drop-orig plan-1
+```
+
+You can find your data files on disk with:
+
+```
+$ moast data path run-1
+~/.local/moast/data/run-1/
+```
+
+and finally, you can completely purge the data for a job with
+
+```
+$ moast data delete plan-1-run-1
+plan-1 deleted.
+```
+
+Eventually archiving and retrieving (to a separate, fixed location, like a volume on a NAS) will also be supported, and there will probably be a way to manage
+the original data as a size or time-limited archive, with keep/retain options, rather than immediately deleting it after processing.
+
+## Viewing
+
+To view the captured images:
+
+```
 $ moast view plan-1
 Launching default FITS viewer...
 ```
+
+Since moast has already rotated, denoised, stitched, etc., this is all you need.
 

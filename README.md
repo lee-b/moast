@@ -11,9 +11,9 @@ This is a SIMPLE command-line frontend to lots of astrophotography tools. It's f
 
 ## Recommended
 
-- A decent telescope
 - A goto mount
-- An IR-capable astrophotography camera on said telescope
+- A decent telescope, on said mount
+- An IR-capable astrophotography camera, on said telescope
 - (Especially for an Alt-Az mount) an autoguider and autoguider camera, either attached to the telescope mount directly ("internal") or via your computer
 - A USB-controlled filter wheel
 - INDI compatibility for all of the above
